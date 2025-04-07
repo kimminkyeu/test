@@ -1,11 +1,10 @@
-import { Database } from 'bun:sqlite';
-import { Broadcaster, BroadcasterRepository } from '@/infra/BroadcasterRepository';
-import log from '@/lib/logger';
+import { GetDBConnection } from '@live-detector/storage/InMemoryDatabase';
+import { Broadcaster, BroadcasterRepository } from '@live-detector/storage/BroadcasterRepository';
+import { log } from '@common/logger';
 import { expect, test } from 'bun:test';
-import InMemoryDatabase from '@/infra/InMemoryDatabase';
 
 test('BroadcasterRepository should find broadcaster by id', () => {
-  const connection = InMemoryDatabase();
+  const connection = GetDBConnection();
   try {
     // given
     const broadcasterRepository = new BroadcasterRepository(connection);
@@ -33,7 +32,7 @@ test('BroadcasterRepository should find broadcaster by id', () => {
 });
 
 test('BroadcasterRepository should update broadcaster correctly', () => {
-  const connection = InMemoryDatabase();
+  const connection = GetDBConnection();
   try {
     // given
     const broadcasterRepository = new BroadcasterRepository(connection);

@@ -58,4 +58,4 @@ enum Color {
   Reset = '\x1b[0m',
 }
 
-export default log;
+export { log };

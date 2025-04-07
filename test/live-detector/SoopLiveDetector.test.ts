@@ -1,4 +1,4 @@
-import SoopLiveDetector from '@/service/detector/SoopLiveDetector';
+import SoopLiveDetector from '@live-detector/internal/SoopLiveDetector';
 import { expect, test } from 'bun:test';
 
 test('SoopLiveDetector should throw error on invalid broadcaster', async () => {

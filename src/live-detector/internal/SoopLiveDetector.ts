@@ -1,7 +1,6 @@
-import PlaywriteCrawler from '@/service/crawler/PlaywriteCrawler';
-import Crawler from '@/service/crawler/PlaywriteCrawler';
-import DetectionFailureError from '@/service/detector/LiveDetectorError';
-import log from '@/lib/logger';
+import Crawler from '@live-detector/internal/PlaywriteCrawler';
+import PlaywriteCrawler from '@live-detector/internal/PlaywriteCrawler';
+import DetectionFailureError from '@live-detector/internal/LiveDetectorError';
 /**
  *
  */

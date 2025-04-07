@@ -1,5 +1,5 @@
 import { Database } from 'bun:sqlite';
-import log from '@/lib/logger';
+import log from '@/common/logger';
 
 function initDatabase() {
   const info = scanDatabase();
@@ -13,7 +13,7 @@ function initDatabase() {
 }
 
 function scanDatabase(): any[] {
-  const db = new Database(Bun.env.INIT_CWD + '/sqlite/broadcaster.db', { create: false });
+  const db = new Database('./sqlite/broadcaster.db');
 
   try {
     const tableInfo = db.query(`PRAGMA table_info('broadcaster')`).all();

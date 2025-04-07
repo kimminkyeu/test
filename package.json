@@ -1,8 +1,9 @@
 {
   "name": "watcher",
   "scripts": {
-    "prepare-check": "bun run src/scripts/prepare.ts",
-    "dev": "bun run prepare-check && bun run --hot src/index.ts"
+    "dev": "bun run --hot src/live-detector/entrypoint.ts src/chat-watcher/entrypoint.ts",
+    "dev:live-detector": "bun run --hot src/live-detector/entrypoint.ts",
+    "dev:chat-watcher": "bun run --hot src/chat-watcher/entrypoint.ts"
   },
   "dependencies": {
     "@types/node-cron": "^3.0.11",

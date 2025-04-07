@@ -1,4 +1,4 @@
-import log from '@/lib/logger';
+import { log } from '@common/logger';
 import { Database } from 'bun:sqlite';
 
 /**
@@ -44,6 +44,12 @@ class BroadcasterRepository {
 
   public findAll(): Broadcaster[] {
     const statement = 'SELECT *, ROWID FROM broadcaster';
+    log.trace(statement);
+    return this.db.query(statement).as(Broadcaster).all();
+  }
+
+  public findByOnLive(): Broadcaster[] {
+    const statement = 'SELECT * FROM broadcaster WHERE live_url IS NOT NULL';
     log.trace(statement);
     return this.db.query(statement).as(Broadcaster).all();
   }

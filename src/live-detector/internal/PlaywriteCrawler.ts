@@ -1,9 +1,13 @@
 import { Browser, Page } from 'playwright';
 import { chromium, PlaywrightBrowserLauncher } from 'playwright-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
-import log from '@/lib/logger';
+import { log } from '@common/logger';
 
 type LaunchOption = Parameters<PlaywrightBrowserLauncher['launch']>;
+
+interface Crawler<K> {
+  afterBrowserLoad<V>(crawlingAction: (page: K) => V): Promise<V>;
+}
 
 class PlaywriteCrawler implements Crawler<Page> {
   private browser?: Browser;
