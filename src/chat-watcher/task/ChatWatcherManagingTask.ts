@@ -1,5 +1,6 @@
-import { BroadcasterApi } from '@chat-watcher/internal/BroadcasterApi';
-import { ChatWatcherManager } from '@chat-watcher/internal/ChatWatcherManager';
+import { SoopBroadcasterApi } from '@chat-watcher/internal/SoopBroadcasterApi';
+import { SoopChatWatcherManager } from '@chat-watcher/internal/SoopChatWatcherManager';
+import { log } from '@common/logger';
 import { Runnable } from '@common/schedular';
 
 /**
@@ -12,24 +13,27 @@ import { Runnable } from '@common/schedular';
         - 현재 방송중인데 감청을 안하고 있으면 다시 킨다.
  */
 class ChatWatcherManagingTask implements Runnable {
-  private readonly watcherManager: ChatWatcherManager;
-  private readonly broadcasterApi: BroadcasterApi;
+  private readonly watcherManager: SoopChatWatcherManager;
+  private readonly broadcasterApi: SoopBroadcasterApi;
 
-  constructor(watcherManager: ChatWatcherManager, broadcasterApi: BroadcasterApi) {
+  constructor(watcherManager: SoopChatWatcherManager, broadcasterApi: SoopBroadcasterApi) {
     this.watcherManager = watcherManager;
     this.broadcasterApi = broadcasterApi;
   }
 
-  public run(): void {
-    const broadcasterList = this.broadcasterApi.getAll();
+  public async run() {
+    log.debug('ChatWatcherManagingTask : run()');
 
-    for (const broadcaster of broadcasterList) {
-      if (!broadcaster.isLive() && this.watcherManager.isWatching(broadcaster.name)) {
-        this.watcherManager.stopWatching(broadcaster.name);
+    for (const broadcaster of await this.broadcasterApi.getAll()) {
+      log.debug(`ChatWatcherManagingTask : BJ[${broadcaster.name}/${broadcaster.liveUrl}]`);
+
+      if (broadcaster.isLive() && !this.watcherManager.isWatching(broadcaster.name)) {
+        this.watcherManager.startWatching(broadcaster.name, broadcaster.liveUrl!);
         continue;
       }
-      if (broadcaster.isLive() && !this.watcherManager.isWatching(broadcaster.name)) {
-        this.watcherManager.startWatching(broadcaster.name);
+
+      if (!broadcaster.isLive()) {
+        this.watcherManager.stopWatching(broadcaster.name);
         continue;
       }
     }

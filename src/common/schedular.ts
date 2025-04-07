@@ -21,7 +21,11 @@ class Schedular {
   public startSchedule() {
     this.schedules.forEach(schedule => {
       cron.schedule(schedule.cronExpr, () => {
-        schedule.task.run();
+        try {
+          schedule.task.run();
+        } catch (error) {
+          console.error(`Error running task ${schedule.name}:`, error);
+        }
       });
     });
   }

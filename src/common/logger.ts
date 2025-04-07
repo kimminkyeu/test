@@ -36,8 +36,10 @@ class Logger {
     // 하지만 Bun 자체는 스레드 ID를 직접 제공하지 않으므로, workerId를 활용하거나
     // 별도의 스레드 관리 로직을 구현해야 합니다.
     const timestamp = new Date().toISOString();
-    const threadHint = Bun.isMainThread ? 'MainThread' : 'Worker[?]';
-    this.logger(`${timestamp} [${threadHint}] ${color}${level}${Color.Reset} ${message}`, ...rest);
+    this.logger(
+      `${Color.Gray}[${timestamp}]${Color.Reset} ${color}${level}${Color.Reset} ${message}`,
+      ...rest
+    );
   }
 }
 
@@ -55,6 +57,7 @@ enum Color {
   Blue = '\x1b[34m',
   Magenta = '\x1b[35m',
   Cyan = '\x1b[36m',
+  Gray = '\x1b[37m',
   Reset = '\x1b[0m',
 }
 

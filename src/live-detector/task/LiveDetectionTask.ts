@@ -13,7 +13,6 @@ class SoopLiveDetectionTask implements Runnable {
   }
 
   public async run() {
-    log.debug('Creating connection');
     const broadcasterRepository = new BroadcasterRepository(InMemoryDBConnection);
     for (const broadcaster of broadcasterRepository.findAll()) {
       broadcaster.live_url = await this.getLiveUrlOf(broadcaster);
@@ -26,7 +25,7 @@ class SoopLiveDetectionTask implements Runnable {
   private async getLiveUrlOf(broadcaster: Broadcaster): Promise<string | null> {
     try {
       const liveUrl = await this.detector.getLiveUrl(broadcaster.broadcaster_name);
-      log.info(`Broadcaster ${broadcaster.broadcaster_name} is live!: ${liveUrl}`);
+      log.info(`### Broadcaster ${broadcaster.broadcaster_name} is LIVE ###: ${liveUrl}`);
       return liveUrl;
     } catch (e) {
       return null;

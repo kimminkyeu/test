@@ -1,7 +1,7 @@
 {
   "name": "watcher",
   "scripts": {
-    "dev": "bun run --hot src/live-detector/entrypoint.ts src/chat-watcher/entrypoint.ts",
+    "dev": "bun run src/live-detector/entrypoint.ts && bun run src/chat-watcher/entrypoint.ts",
     "dev:live-detector": "bun run --hot src/live-detector/entrypoint.ts",
     "dev:chat-watcher": "bun run --hot src/chat-watcher/entrypoint.ts"
   },

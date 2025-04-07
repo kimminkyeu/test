@@ -3,11 +3,13 @@ import ssl
 import asyncio
 import websockets
 from api import get_player_live
+import sys
+import json
 
 # 유니코드 및 기타 상수
 F = "\x0c"
 ESC = "\x1b\t"
-SEPARATOR = "+" + "-" * 70 + "+"
+SEPARATOR = "+++++++++++++++++++++++++++++++++++++++++" # 구분자 삭제
 
 # SSL 컨텍스트 생성
 def create_ssl_context():
@@ -21,10 +23,17 @@ def create_ssl_context():
 def decode_message(bytes):
     parts = bytes.split(b'\x0c')
     messages = [part.decode('utf-8') for part in parts]
-    if len(messages) > 5 and messages[1] not in ['-1', '1'] and '|' not in messages[1]:
-        user_id, comment, user_nickname = messages[2], messages[1], messages[6]
-        print(SEPARATOR)
-        print(f"| {user_nickname}[{user_id}] - {comment}")    
+    # 메시지 길이가 13자인 경우가 일반 채팅인 것 까지 확인. 별풍선이나 다른건 더 테스트 해봐야 한다.
+    if len(messages) == 13 and messages[1] not in ['-1', '1'] and '|' not in messages[1]:
+        # print(messages)
+        # print(len(messages))
+        x = {
+            'user_id': messages[2],
+            'user_nickname': messages[6],
+            'comment': messages[1],
+        }
+        # print(SEPARATOR)
+        print(json.dumps(x, ensure_ascii=False))
     else:
         # 채팅 뿐만 아니라 다른 메세지도 동시에 내려옵니다.
         pass
@@ -38,13 +47,23 @@ async def connect_to_chat(url, ssl_context):
     try:
         BNO, BID = url.split('/')[-1], url.split('/')[-2]
         CHDOMAIN, CHATNO, FTK, TITLE, BJID, CHPT = get_player_live(BNO, BID)
-        print(f"{SEPARATOR}\n"
-              f"  CHDOMAIN: {CHDOMAIN}\n  CHATNO: {CHATNO}\n  FTK: {FTK}\n"
-              f"  TITLE: {TITLE}\n  BJID: {BJID}\n  CHPT: {CHPT}\n"
-              f"{SEPARATOR}")
+        x = {
+            'CHDOMAIN': CHDOMAIN,
+            'CHATNO': CHATNO,
+            'FTK': FTK,
+            'TITLE': TITLE,
+            'BJID': BJID,
+            'CHPT': CHPT
+        }
+        # print(f"{SEPARATOR}\n"
+        #       f"  CHDOMAIN: {CHDOMAIN}\n  CHATNO: {CHATNO}\n  FTK: {FTK}\n"
+        #       f"  TITLE: {TITLE}\n  BJID: {BJID}\n  CHPT: {CHPT}\n"
+        #       f"{SEPARATOR}")
+        print(json.dumps(x, ensure_ascii=False))
     except Exception as e:
         print(f"  ERROR: API 호출 실패 - {e}")
-        return
+        sys.exit(1)
+        # return
 
     try:
         async with websockets.connect(
@@ -61,7 +80,7 @@ async def connect_to_chat(url, ssl_context):
             PING_PACKET = f'{ESC}000000000100{F}'
 
             await websocket.send(CONNECT_PACKET)
-            print(f"  연결 성공, 채팅방 정보 수신 대기중...")
+            # print(f"  연결 성공, 채팅방 정보 수신 대기중...")
             await asyncio.sleep(2)
             await websocket.send(JOIN_PACKET)
 
@@ -83,9 +102,13 @@ async def connect_to_chat(url, ssl_context):
 
     except Exception as e:
         print(f"  ERROR: 웹소켓 연결 오류 - {e}")
+        sys.exit(1)
 
 async def main():
-    url = input("아프리카TV URL을 입력해주세요: ")
+    if len(sys.argv) != 2:
+        print("Must provide SOOP live URL")
+        sys.exit(1)
+    url = sys.argv[1]
     ssl_context = create_ssl_context()
     await connect_to_chat(url, ssl_context)
 

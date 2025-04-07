@@ -9,6 +9,7 @@ import { Broadcaster, BroadcasterRepository } from '@live-detector/storage/Broad
 import { InMemoryDBConnection } from '@live-detector/storage/InMemoryDatabase';
 
 import broadcasterInfoListJson from '@root/broadcaster.json';
+import { SoopLiveDetectorApiDto } from '@common/SoopLiveDetectorApiResponse';
 
 /**
  *
@@ -43,34 +44,32 @@ new Schedular()
   .startSchedule();
 
 /**
- *
+ * Hono 서버 생성
  */
 const api = new Hono();
 api.use('*', logger(log.printFn.bind(log)));
+
 /**
- * 현재 방송중인 방송인 리스트
+ * 현재 방송중인 방송인 리스트를 획득해서 반환
  */
 api.get('/live', c => {
-  const broadcasterRepository = new BroadcasterRepository(InMemoryDBConnection);
-  const list = broadcasterRepository.findByOnLive().map(broadcaster => {
-    return {
-      name: broadcaster.broadcaster_name,
-      live_url: broadcaster.live_url,
-    };
-  });
+  const list = new BroadcasterRepository(InMemoryDBConnection)
+    .findByOnLive()
+    .map(
+      broadcaster => new SoopLiveDetectorApiDto(broadcaster.broadcaster_name, broadcaster.live_url)
+    );
   return c.json(list);
 });
+
 /**
- * 추적중인 방송인 리스트
+ * 추적중인 방송인 리스트를 획득해서 반환
  */
 api.get('/', c => {
-  const broadcasterRepository = new BroadcasterRepository(InMemoryDBConnection);
-  const list = broadcasterRepository.findAll().map(broadcaster => {
-    return {
-      name: broadcaster.broadcaster_name,
-      isLive: broadcaster.isLive(),
-    };
-  });
+  const list = new BroadcasterRepository(InMemoryDBConnection)
+    .findAll()
+    .map(
+      broadcaster => new SoopLiveDetectorApiDto(broadcaster.broadcaster_name, broadcaster.live_url)
+    );
   return c.json(list);
 });
 
